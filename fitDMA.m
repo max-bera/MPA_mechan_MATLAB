@@ -3,6 +3,7 @@ function [Es,El,tand] = fitDMA(time,Lp,dP,pip_rad,Rc,freqs,ncycles,dt,...
 %%
 %fitDMA.m takes Lp/dP and the experimental protocol as an input, segments
 %the data in the single frequency portions, and calculates E'/E'' and tand
+%by using an extend version of the linearized ZHou model.
 %
 %!!! The model currently assumens incompressibility (i.e. ni = 0.5) !!!
 %
@@ -19,7 +20,7 @@ function [Es,El,tand] = fitDMA(time,Lp,dP,pip_rad,Rc,freqs,ncycles,dt,...
 %creept [s]    *    creep time at target preload
 %waitt [s]     *    waiting period in between oscillations
 %rate {Hz]     *    sampling rate
-%name               sample name (for saving plots)
+%name               sample name (for saving *.svg plots)
 %plotres            boolean, plot fit results
 %
 %OUTPUT:
@@ -33,10 +34,10 @@ if nargin<14; plotres = 0; return; end
 %%
 %calculate start/end points in the array for each frequency
 start_DMA = zeros(length(freqs),1);
-start_DMA(1) = ceil(dt+rampt+creept+waitt)*rate;
+start_DMA(1) = ceil(dt+rampt+creept)*rate;
 fin_DMA(1) = floor(start_DMA(1)+ncycles(1)/freqs(1)*rate);
 for i = 2:length(freqs)
-    start_DMA(i) = ceil(fin_DMA(i-1)+waitt*rate);
+    start_DMA(i) = floor(fin_DMA(i-1)+waitt*rate);
     fin_DMA(i) = floor(start_DMA(i)+ncycles(i)/freqs(i)*rate);
 end
 
@@ -50,28 +51,30 @@ for i=1:length(start_DMA)
     dP_f = dP(start_DMA(i):fin_DMA(i));
     time_f = time(start_DMA(i):fin_DMA(i));                 
     [~,E1,E2] = fitDynSweep(time_f,Lp_f,dP_f,...
-                    pip_rad,Rc,plotres,0.5,DMA_freq(i),name);
+                    pip_rad,Rc,plotres,0.5,freqs(i),name);
     Es(i) = E1;
     El(i) = E2;
     tand(i) = El(i)/Es(i);
 end
 
 %plot summary of the fit
-res_DMAfit = figure;
-figure(res_DMAfit)
-plot(DMA_freq,Es/1000,'o-k')
-hold on
-xlabel('frequency [Hz]')
-plot(DMA_freq,El/1000,'*-k')
-yyaxis left
-ylabel('E''/E'''' [kPa]');
-yyaxis right
-plot(DMA_freq,El./Es,'.-r')
-ylabel('tand\delta');
-ax=gca;
-ax.XScale = 'log';
-ax.YColor = 'r';
-grid on
-legend E'' E'''' tan\delta;
-hold off
+if plotres == true
+    res_DMAfit = figure;
+    figure(res_DMAfit)
+    plot(freqs,Es/1000,'o-k')
+    hold on
+    xlabel('frequency [Hz]')
+    plot(freqs,El/1000,'*-k')
+    yyaxis left
+    ylabel('E''/E'''' [kPa]');
+    yyaxis right
+    plot(freqs,El./Es,'.-r')
+    ylabel('tand\delta');
+    ax=gca;
+    ax.XScale = 'log';
+    ax.YColor = 'r';
+    grid on
+    legend E'' E'''' tan\delta;
+    hold off
+end
 end
