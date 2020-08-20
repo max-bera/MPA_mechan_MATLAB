@@ -1,4 +1,5 @@
 close all
+clc
 %%
 %deltasens data
 path = 'C:\Users\Massimiliano\Desktop\DeltaSens signals\';
@@ -12,14 +13,14 @@ Rc = 505e-6;        %m
 rate = 1000;        %Hz
 
 %DMA
-ncycles =  [1 1 3 4 5];    %number of cycles
+freqs = [0.05 0.1 0.33 0.7 .8333];    %testing frequencies
+ncycles =  [1 1 3 4 5];             %number of cycles per frequency
 %--------------these are also used for quasi-static test-------------------
-dt = 2;                    %lag before test starts [s]
-rampt = 10;                %time to reach the preload [s]
+dt = 1.6;                             %lag before test starts [s]
+rampt = 10;                         %time to reach the preload [s]
 %--------------------------------------------------------------------------
-creept = 10;               %creep time at target preload [s]
-waitt = 2;                 %pause between oscillations [s]
-freqs = [0.05 0.1 0.33 0.7 .85]; %testing frequencies
+creept = 10;                        %creep time at target preload [s]
+waitt = 2;                          %pause between oscillations [s]
 %%
 %deltasens processing
 filename = strcat(path,name,format);        

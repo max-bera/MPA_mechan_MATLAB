@@ -1,39 +1,34 @@
 function [freq,E1,E2,phi,omd,phid,ampld,y0d,omf,phif,amplf,y0f]=...
             fitDynSweep(t,d,f,R,R_c,pl,ni,freq_in,fName)
 %%
-% fitDynSweep.m - fit one oscillation sweep and obtain results
+% fitDynSweep.m - fit one oscillation sweep
 %
-%INPUT:
-%t         - time (s)
-%d         - aspirated length (m)
-%f         - aspiration pressure (Pa)
-%R         - radius of the pipette (m)
-%R_c       - radius of the sample (m)
-%pl        - toggle plot (1=on, 0=off)
-%nu        - poisson ratio (def 0.5)
-%freq_in   - frequency as starting point for sine-fit (def is determined
-%            by fft of load-data input)
-%fName     - filename to save results to (default not saved)
+%INPUT: (* are mandatory
+%t        *   time (s)
+%d        *   aspirated length (m)
+%f        *   aspiration pressure (Pa)
+%R        *   radius of the pipette (m)
+%R_c      *   radius of the sample (m)
+%pl       *   toggle plot (1=on, 0=off)
+%nu       *   poisson ratio (def 0.5)
+%freq_in  *   frequency as starting point for sine-fit
+%fName        filename to save results to (default not saved)
 %
 %output:
-%freq      - frequency (Hz); fitted on pressure-sweep and imposed in
-%            aspirated length sweep 
-%E1        - Storage Young's Modulus E' (Pa)
-%E2        - Loss Young's Modulus E'' (Pa)
-%phi       - Loss tangent (degrees)
-%omd       - angular frequency aspirated length oscillation
-%phid      - phase fit aspirated lengthoscillation
-%ampld     - amplitude fit aspirated length oscillation
-%y0d       - offset fit aspirated length oscillation
-%omf       - angular frequency pressure oscillation
-%phif      - phase fit pressure oscillation
-%amplf     - amplitude fit pressure oscillation
-%y0f       - offset fit pressure oscillation
+%freq        frequency (Hz)
+%E1          Storage Young's Modulus E' (Pa)
+%E2          Loss Young's Modulus E'' (Pa)
+%phi         Loss tangent (degrees)
+%omd         angular frequency aspirated length oscillation
+%phid        phase fit aspirated length oscillation
+%ampld       amplitude fit aspirated length oscillation
+%y0d         offset fit aspirated length oscillation
+%omf         angular frequency pressure oscillation
+%phif        phase fit pressure oscillation
+%amplf       amplitude fit pressure oscillation
+%y0f         offset fit pressure oscillation
 %%
-if nargin<1; help fitDynSweep; return; end
-if nargin<6, pl=0; end
-if nargin<7, ni = 0.5; end
-if nargin<8, freq_in=[]; end
+if nargin<8; help fitDynSweep; return; end
 if nargin<9, fName=[]; end
 %%
 minRsq = 0;
@@ -44,23 +39,13 @@ beta3 = 2.1187;
 t=t-t(1);
 
 % fit with periodic functions
-if isempty(freq_in)     
-    initLin=[-0.00005, 0.00005];
-    per=1/freq_in;
-	[omf,phif,amplf,y0f,lin_Ffit]=fitCosLin(t,f,per,1,initLin,0);
-else
-    per=1/freq_in;
-    %with correction
-    initLin=[-0.05, 0.05];
-    [omf,phif,amplf,y0f,lin_Ffit]=fitCosLin(t,f,per,1,initLin,0);
-end
+per=1/freq_in;
+%with linear correction
+initLin=[-0.05, 0.05];
+[omf,phif,amplf,y0f,lin_Ffit]=fitCosLin(t,f,per,1,initLin,0);
 ffit = lin_Ffit(1) + amplf .* cos(omf .* t + phif) + lin_Ffit(2).*t;
 per_force=2*pi/omf; 
-% do a fit with the periodicity from the force curve imposed on the indentation
-%[omd,phid,ampld,y0d]=fitCos(t,d,per_force,1);
-%dfit = y0d + ampld .* cos(omd .* t + phid);
 
-% OPTIONAL add a linear fit to the cosine fit
 initLin=[-0.0000005, 0.0000005];
 [omd,phid,ampld,y0d,linFit]=fitCosLin(t,d,per_force,1,initLin,0);
 dfit = ampld .* cos(omd .* t + phid) +linFit(2).*t+linFit(1);

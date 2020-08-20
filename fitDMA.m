@@ -7,7 +7,7 @@ function [Es,El,tand] = fitDMA(time,Lp,dP,pip_rad,Rc,freqs,ncycles,dt,...
 %
 %!!! The model currently assumens incompressibility (i.e. ni = 0.5) !!!
 %
-%INPUT:
+%INPUT: (* are mandatory)
 %time [s]      *    time
 %Lp [m]        *    array of aspirated lengths
 %dP [Pa]       *    array of corresponding pressure points
@@ -29,8 +29,8 @@ function [Es,El,tand] = fitDMA(time,Lp,dP,pip_rad,Rc,freqs,ncycles,dt,...
 %tand [-]           loss factor
 %%
 if nargin<12; help fitDMA; return; end
-if nargin<13; name = []; return; end
-if nargin<14; plotres = 0; return; end
+if nargin<13; name = [];  end
+if nargin<14; plotres = 0; end
 %%
 %calculate start/end points in the array for each frequency
 start_DMA = zeros(length(freqs),1);
