@@ -5,3 +5,7 @@ fitLinZhou.m calculates the elastic modulus of a sample from a pressure/aspirate
              the sample is assumed to be incompressible and having finite size. The equation used was originally presented in: https://doi.org/10.1039/c5sm00125k
              
 fitDMA.m calculates storage/loss moduli for a DMA-like aspiration test. The equations are an extension of the model used in fitLinZhou, and the same hypotheses hold true here.
+
+!!!
+The code is meant to work with *.tdms files (a LabView proprietary file format).
+You can download a importer for matlab here: https://au.mathworks.com/matlabcentral/fileexchange/30023-tdms-reader
